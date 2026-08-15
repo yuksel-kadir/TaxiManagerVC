@@ -1,0 +1,27 @@
+# Visual Studio user and workspace files
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build outputs
+bin/
+obj/
+Debug/
+Release/
+*.asi
+*.exp
+*.ilk
+*.lib
+*.obj
+*.pdb
+
+# CI dependencies and logs
+_deps/
+package/
+*.log
+
+# Windows
+Thumbs.db
+Desktop.ini

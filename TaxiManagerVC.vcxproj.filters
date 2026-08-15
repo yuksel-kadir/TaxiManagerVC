@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source\App"><UniqueIdentifier>{52AF115C-4C9F-4E49-A2E7-A76C0FC18CA8}</UniqueIdentifier></Filter>
+    <Filter Include="Source\Camera"><UniqueIdentifier>{5184615E-A0CA-4B43-9430-7131C1237F36}</UniqueIdentifier></Filter>
+    <Filter Include="Source\Config"><UniqueIdentifier>{F29A486D-B3D4-48AC-A441-9CD719E0BEDB}</UniqueIdentifier></Filter>
+    <Filter Include="Source\Core"><UniqueIdentifier>{B0FB35C3-264A-48B1-99A4-8C6D1E0B34CB}</UniqueIdentifier></Filter>
+    <Filter Include="Source\Destinations"><UniqueIdentifier>{6436A291-F96A-492F-B055-C34985674C8B}</UniqueIdentifier></Filter>
+    <Filter Include="Source\Gameplay"><UniqueIdentifier>{B12CB0E8-166C-4AED-8D6A-131BB5158348}</UniqueIdentifier></Filter>
+    <Filter Include="Source\Input"><UniqueIdentifier>{122F3081-D6B1-4DF0-85EF-81B8369D5A74}</UniqueIdentifier></Filter>
+    <Filter Include="Source\Integrations"><UniqueIdentifier>{C5F57652-473E-4994-884B-3D4DEBB4DC73}</UniqueIdentifier></Filter>
+    <Filter Include="Source\UI"><UniqueIdentifier>{77BBFD0A-D6D6-453E-8896-EF9F602B53AB}</UniqueIdentifier></Filter>
+    <Filter Include="Project Files"><UniqueIdentifier>{88BAC7BB-21EE-4091-B69F-B88166305DE1}</UniqueIdentifier></Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="source\app\Main.cpp"><Filter>Source\App</Filter></ClCompile>
+    <ClCompile Include="source\camera\TaxiCameraController.cpp"><Filter>Source\Camera</Filter></ClCompile>
+    <ClCompile Include="source\config\TaxiConfig.cpp"><Filter>Source\Config</Filter></ClCompile>
+    <ClCompile Include="source\core\TaxiManager.cpp"><Filter>Source\Core</Filter></ClCompile>
+    <ClCompile Include="source\destinations\DestinationRepository.cpp"><Filter>Source\Destinations</Filter></ClCompile>
+    <ClCompile Include="source\gameplay\TaxiOperations.cpp"><Filter>Source\Gameplay</Filter></ClCompile>
+    <ClCompile Include="source\input\InputManager.cpp"><Filter>Source\Input</Filter></ClCompile>
+    <ClCompile Include="source\integrations\DebugMenuIntegration.cpp"><Filter>Source\Integrations</Filter></ClCompile>
+    <ClCompile Include="source\integrations\MenuMapIntegration.cpp"><Filter>Source\Integrations</Filter></ClCompile>
+    <ClCompile Include="source\ui\Hud.cpp"><Filter>Source\UI</Filter></ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="source\camera\TaxiCameraController.h"><Filter>Source\Camera</Filter></ClInclude>
+    <ClInclude Include="source\config\TaxiConfig.h"><Filter>Source\Config</Filter></ClInclude>
+    <ClInclude Include="source\core\TaxiManager.h"><Filter>Source\Core</Filter></ClInclude>
+    <ClInclude Include="source\core\TaxiTypes.h"><Filter>Source\Core</Filter></ClInclude>
+    <ClInclude Include="source\destinations\DestinationRepository.h"><Filter>Source\Destinations</Filter></ClInclude>
+    <ClInclude Include="source\gameplay\TaxiOperations.h"><Filter>Source\Gameplay</Filter></ClInclude>
+    <ClInclude Include="source\input\InputManager.h"><Filter>Source\Input</Filter></ClInclude>
+    <ClInclude Include="source\integrations\DebugMenuIntegration.h"><Filter>Source\Integrations</Filter></ClInclude>
+    <ClInclude Include="source\integrations\MenuMapIntegration.h"><Filter>Source\Integrations</Filter></ClInclude>
+    <ClInclude Include="source\ui\Hud.h"><Filter>Source\UI</Filter></ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="README.md"><Filter>Project Files</Filter></None>
+    <None Include="TaxiManagerVC.ini"><Filter>Project Files</Filter></None>
+    <None Include="TaxiManagerVC.destinations.csv"><Filter>Project Files</Filter></None>
+    <None Include="northpointmallradaricon.txd"><Filter>Project Files</Filter></None>
+  </ItemGroup>
+</Project>

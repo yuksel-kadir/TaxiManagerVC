@@ -1,0 +1,67 @@
+name: Build
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Debug and Release VC Win32
+    runs-on: windows-2022
+
+    env:
+      PLUGIN_SDK_DIR: ${{ github.workspace }}\_deps\plugin-sdk
+
+    steps:
+      - name: Checkout TaxiManagerVC
+        uses: actions/checkout@v4
+
+      - name: Checkout Plugin-SDK
+        uses: actions/checkout@v4
+        with:
+          repository: DK22Pac/plugin-sdk
+          ref: 8c581d406bc468ff4587908cbab05449fce4b2b1
+          path: _deps/plugin-sdk
+          submodules: recursive
+
+      - name: Set up MSBuild
+        uses: microsoft/setup-msbuild@v3
+
+      - name: Build Plugin-SDK VC libraries
+        shell: pwsh
+        run: |
+          msbuild "$env:PLUGIN_SDK_DIR\plugin_vc\plugin_vc.vcxproj" /m /t:Build `
+            /p:Configuration=zDebug /p:Platform=Win32 /v:minimal
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+          msbuild "$env:PLUGIN_SDK_DIR\plugin_vc\plugin_vc.vcxproj" /m /t:Build `
+            /p:Configuration=Release /p:Platform=Win32 /v:minimal
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Build TaxiManagerVC
+        shell: pwsh
+        run: |
+          msbuild .\TaxiManagerVC.sln /m /t:Build `
+            /p:Configuration=Debug /p:Platform=Win32 /v:minimal
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+          msbuild .\TaxiManagerVC.sln /m /t:Build `
+            /p:Configuration=Release /p:Platform=Win32 /v:minimal
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Stage Release package
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Path .\package | Out-Null
+          Copy-Item .\bin\VC\Release\TaxiManagerVC.VC.asi .\package\
+          Copy-Item .\TaxiManagerVC.ini .\package\
+          Copy-Item .\TaxiManagerVC.destinations.csv .\package\
+          Copy-Item .\northpointmallradaricon.txd .\package\
+
+      - name: Upload Release package
+        uses: actions/upload-artifact@v4
+        with:
+          name: TaxiManagerVC-Release-Win32
+          path: package/
+          if-no-files-found: error

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Release VC|Win32"><Configuration>Release VC</Configuration><Platform>Win32</Platform></ProjectConfiguration>
+    <ProjectConfiguration Include="Debug VC|Win32"><Configuration>Debug VC</Configuration><Platform>Win32</Platform></ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals"><ProjectGuid>{2FA7D6BB-9B67-52F2-64A2-9B6FD02197CE}</ProjectGuid><Keyword>Win32Proj</Keyword><RootNamespace>TaxiManagerVC</RootNamespace><WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion></PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release VC|Win32'" Label="Configuration"><ConfigurationType>DynamicLibrary</ConfigurationType><UseDebugLibraries>false</UseDebugLibraries><PlatformToolset>v143</PlatformToolset><WholeProgramOptimization>true</WholeProgramOptimization></PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug VC|Win32'" Label="Configuration"><ConfigurationType>DynamicLibrary</ConfigurationType><UseDebugLibraries>true</UseDebugLibraries><PlatformToolset>v143</PlatformToolset></PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release VC|Win32'"><OutDir>$(ProjectDir)bin\VC\Release\</OutDir><IntDir>$(ProjectDir)obj\VC\Release\</IntDir><TargetName>TaxiManagerVC.VC</TargetName><TargetExt>.asi</TargetExt></PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug VC|Win32'"><OutDir>$(ProjectDir)bin\VC\Debug\</OutDir><IntDir>$(ProjectDir)obj\VC\Debug\</IntDir><TargetName>TaxiManagerVC.VC</TargetName><TargetExt>.asi</TargetExt></PropertyGroup>
+  <ItemDefinitionGroup><ClCompile><WarningLevel>Level3</WarningLevel><PreprocessorDefinitions>_CRT_NON_CONFORMING_SWPRINTFS;TARGET_NAME=R"($(TargetName))";GTAVC;GTAGAME_NAME="Vice City";GTAGAME_ABBR="VC";GTAGAME_ABBRLOW="vc";GTAGAME_PROTAGONISTNAME="Tommy";GTAGAME_CITYNAME="Vice City";PLUGIN_SGV_10EN;RW;%(PreprocessorDefinitions)</PreprocessorDefinitions><AdditionalIncludeDirectories>$(ProjectDir)source;$(PLUGIN_SDK_DIR)\plugin_vc;$(PLUGIN_SDK_DIR)\plugin_vc\game_vc;$(PLUGIN_SDK_DIR)\plugin_vc\game_vc\enums;$(PLUGIN_SDK_DIR)\plugin_vc\game_vc\rw;$(PLUGIN_SDK_DIR)\shared;$(PLUGIN_SDK_DIR)\shared\game;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories><MultiProcessorCompilation>true</MultiProcessorCompilation><RuntimeLibrary Condition="'$(Configuration)'=='Debug VC'">MultiThreadedDebug</RuntimeLibrary><RuntimeLibrary Condition="'$(Configuration)'=='Release VC'">MultiThreaded</RuntimeLibrary><Optimization Condition="'$(Configuration)'=='Release VC'">Full</Optimization><AdditionalOptions>/sdl- /std:c++latest %(AdditionalOptions)</AdditionalOptions></ClCompile><Link><SubSystem>Windows</SubSystem><IgnoreImportLibrary>true</IgnoreImportLibrary><AdditionalDependencies Condition="'$(Configuration)'=='Debug VC'">Plugin_VC_d.lib;%(AdditionalDependencies)</AdditionalDependencies><AdditionalDependencies Condition="'$(Configuration)'=='Release VC'">Plugin_VC.lib;%(AdditionalDependencies)</AdditionalDependencies><AdditionalLibraryDirectories>$(PLUGIN_SDK_DIR)\output\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories></Link><PostBuildEvent Condition="'$(Configuration)'=='Release VC'"><Command>if defined GTA_VC_DIR (
+if not exist "$(GTA_VC_DIR)\scripts" mkdir "$(GTA_VC_DIR)\scripts"
+copy /Y "$(TargetPath)" "$(GTA_VC_DIR)\scripts\$(TargetFileName)"
+copy /Y "$(ProjectDir)TaxiManagerVC.ini" "$(GTA_VC_DIR)\scripts\TaxiManagerVC.ini"
+copy /Y "$(ProjectDir)TaxiManagerVC.destinations.csv" "$(GTA_VC_DIR)\scripts\TaxiManagerVC.destinations.csv"
+copy /Y "$(ProjectDir)northpointmallradaricon.txd" "$(GTA_VC_DIR)\scripts\northpointmallradaricon.txd"
+)</Command></PostBuildEvent></ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="source\app\Main.cpp" />
+    <ClCompile Include="source\camera\TaxiCameraController.cpp" />
+    <ClCompile Include="source\config\TaxiConfig.cpp" />
+    <ClCompile Include="source\core\TaxiManager.cpp" />
+    <ClCompile Include="source\destinations\DestinationRepository.cpp" />
+    <ClCompile Include="source\gameplay\TaxiOperations.cpp" />
+    <ClCompile Include="source\input\InputManager.cpp" />
+    <ClCompile Include="source\integrations\MenuMapIntegration.cpp" />
+    <ClCompile Include="source\integrations\DebugMenuIntegration.cpp" />
+    <ClCompile Include="source\ui\Hud.cpp" />
+  </ItemGroup>
+  <ItemGroup><None Include="README.md" /><None Include="TaxiManagerVC.ini" /><None Include="TaxiManagerVC.destinations.csv" /><None Include="northpointmallradaricon.txd" /></ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+</Project>
