@@ -28,6 +28,13 @@ jobs:
       - name: Set up MSBuild
         uses: microsoft/setup-msbuild@v3
 
+      - name: Generate Plugin-SDK projects
+        shell: pwsh
+        run: |
+          & "$env:PLUGIN_SDK_DIR\tools\premake\premake5.exe" vs2022 `
+            --file="$env:PLUGIN_SDK_DIR\tools\premake\premake5.lua"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
       - name: Build Plugin-SDK VC libraries
         shell: pwsh
         run: |
