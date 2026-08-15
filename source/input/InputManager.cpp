@@ -48,6 +48,22 @@ bool InputManager::JustPressed(TaxiAction action, const TaxiConfig &config) {
     return keyboardPressed || alternateKeyboardPressed || padPressed;
 }
 
+void InputManager::Consume(TaxiAction action, const TaxiConfig &config) {
+    const auto &binding = config.Binding(action);
+    const auto consumeKeyboard = [this](int virtualKey) {
+        if (virtualKey > 0 && virtualKey < static_cast<int>(keyboardPrevious_.size())) {
+            keyboardPrevious_[virtualKey] = (GetAsyncKeyState(virtualKey) & 0x8000) != 0;
+        }
+    };
+
+    consumeKeyboard(binding.virtualKey);
+    consumeKeyboard(binding.alternateVirtualKey);
+
+    if (binding.padButton >= 0 && binding.padButton < static_cast<int>(gamepadPrevious_.size())) {
+        gamepadPrevious_[binding.padButton] = GamepadValue(binding.padButton) != 0;
+    }
+}
+
 void InputManager::Reset() {
     keyboardPrevious_.fill(false);
     gamepadPrevious_.fill(false);

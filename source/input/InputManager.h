@@ -7,6 +7,7 @@
 class InputManager final {
   public:
     bool JustPressed(TaxiAction action, const TaxiConfig &config);
+    void Consume(TaxiAction action, const TaxiConfig &config);
     void Reset();
 
   private:

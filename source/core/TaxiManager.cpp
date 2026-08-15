@@ -390,6 +390,7 @@ void TaxiManager::UpdateTripProgress(CPlayerPed *player, CVehicle *taxi) {
 }
 
 void TaxiManager::ConfirmDestination(CPlayerPed *player, CVehicle *taxi) {
+    const bool confirmedFromBrowser = destinationBrowserVisible_;
     const Destination *destination = SelectedDestination();
 
     if (!destination) {
@@ -455,7 +456,19 @@ void TaxiManager::ConfirmDestination(CPlayerPed *player, CVehicle *taxi) {
     destinationBrowserVisible_ = false;
     hud_.HideBrowser();
     stateStartedAt_ = CTimer::m_snTimeInMilliseconds;
-    hud_.ShowSelection(destination->name, kConfirmed, kConfirmedTextDurationMs);
+
+    if (confirmedFromBrowser) {
+        input_.Consume(TaxiAction::ToggleDestinations, config_);
+        input_.Consume(TaxiAction::PreviousDestination, config_);
+        input_.Consume(TaxiAction::NextDestination, config_);
+        input_.Consume(TaxiAction::ConfirmDestination, config_);
+        input_.Consume(TaxiAction::PreviousDestinationCategory, config_);
+        input_.Consume(TaxiAction::NextDestinationCategory, config_);
+        hud_.HideSelection();
+    } else {
+        hud_.ShowSelection(destination->name, kConfirmed, kConfirmedTextDurationMs);
+    }
+
     DMAudio.PlayFrontEndSound(kHelpSound, 0);
 }
 
