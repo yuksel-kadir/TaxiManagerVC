@@ -43,6 +43,7 @@ listed below, to leave the browser.
 | Show or hide quick destinations | Up Arrow or W | D-pad Up |
 | Previous destination | Left Arrow or A | D-pad Left |
 | Next destination | Right Arrow or D | D-pad Right |
+| Previous or next quick-menu group | Left Shift/Right Shift | Disabled |
 | Confirm destination | Down Arrow or S | D-pad Down |
 | Open destination browser | Tab | Select |
 | Skip travel | G | Start |

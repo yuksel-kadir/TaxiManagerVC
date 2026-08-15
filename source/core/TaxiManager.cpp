@@ -202,6 +202,7 @@ void TaxiManager::ProcessAwaitingEntry(CPlayerPed *player, CVehicle *taxi) {
         selectionCursor_ = 0;
         state_ = TaxiSessionState::SelectingDestination;
         stateStartedAt_ = CTimer::m_snTimeInMilliseconds;
+        BuildDestinationCategories();
         RefreshSelection();
         hud_.ShowHelp("Taxi passenger: ~h~~k~~GO_FORWARD~~w~ show destinations; "
                       "~h~~k~~GO_LEFT~~w~ / ~h~~k~~GO_RIGHT~~w~ browse; "
@@ -246,6 +247,7 @@ void TaxiManager::SynchronizeDestinations(unsigned int now) {
             if (destinationBrowserVisible_) {
                 BuildDestinationBrowser();
             } else {
+                BuildDestinationCategories();
                 RefreshSelection();
             }
         }
@@ -273,6 +275,10 @@ void TaxiManager::ProcessCompactDestinationMenu(CPlayerPed *player, CVehicle *ta
     const bool previousPressed = input_.JustPressed(TaxiAction::PreviousDestination, config_);
     const bool nextPressed = input_.JustPressed(TaxiAction::NextDestination, config_);
     const bool confirmPressed = input_.JustPressed(TaxiAction::ConfirmDestination, config_);
+    const bool previousCategoryPressed =
+        input_.JustPressed(TaxiAction::PreviousDestinationCategory, config_);
+    const bool nextCategoryPressed =
+        input_.JustPressed(TaxiAction::NextDestinationCategory, config_);
 
     if (input_.JustPressed(TaxiAction::ToggleDestinations, config_)) {
         if (destinationMenuVisible_) {
@@ -287,8 +293,20 @@ void TaxiManager::ProcessCompactDestinationMenu(CPlayerPed *player, CVehicle *ta
             state_ = TaxiSessionState::SelectingDestination;
             destinationMenuVisible_ = true;
             RefreshAvailableDestinations();
+            BuildDestinationCategories();
             RefreshSelection();
         }
+    }
+
+    if (previousCategoryPressed || nextCategoryPressed) {
+        if (!destinationMenuVisible_) {
+            state_ = TaxiSessionState::SelectingDestination;
+            destinationMenuVisible_ = true;
+            RefreshAvailableDestinations();
+            BuildDestinationCategories();
+        }
+
+        SelectCompactCategory(previousCategoryPressed ? -1 : 1);
     }
 
     // Previous/Next are useful shortcuts as well as browsing controls. During
@@ -299,9 +317,10 @@ void TaxiManager::ProcessCompactDestinationMenu(CPlayerPed *player, CVehicle *ta
             state_ = TaxiSessionState::SelectingDestination;
             destinationMenuVisible_ = true;
             RefreshAvailableDestinations();
+            BuildDestinationCategories();
         }
 
-        SelectRelative(previousPressed ? -1 : 1);
+        SelectCompactDestination(previousPressed ? -1 : 1);
     }
 
     if (state_ == TaxiSessionState::SelectingDestination && destinationMenuVisible_ &&
@@ -541,14 +560,35 @@ void TaxiManager::Cleanup(CPlayerPed *player, CVehicle *taxi, bool chargeFare,
     hud_.HideBrowser();
 }
 
-void TaxiManager::SelectRelative(int offset) {
-    if (availableDestinations_.empty()) {
+void TaxiManager::SelectCompactCategory(int offset) {
+    if (browserCategories_.empty()) {
         return;
     }
 
-    const int size = static_cast<int>(availableDestinations_.size());
-    selectionCursor_ =
-        static_cast<std::size_t>((static_cast<int>(selectionCursor_) + offset + size) % size);
+    const int count = static_cast<int>(browserCategories_.size());
+    browserCategoryCursor_ = static_cast<std::size_t>(
+        (static_cast<int>(browserCategoryCursor_) + offset + count) % count);
+    browserItemCursor_ = 0;
+    ApplyCategorySelection();
+    RefreshSelection();
+    DMAudio.PlayFrontEndSound(kHelpSound, 0);
+}
+
+void TaxiManager::SelectCompactDestination(int offset) {
+    if (browserCategoryCursor_ >= browserCategories_.size()) {
+        return;
+    }
+
+    const auto &category = browserCategories_[browserCategoryCursor_];
+
+    if (category.destinationIds.empty()) {
+        return;
+    }
+
+    const int count = static_cast<int>(category.destinationIds.size());
+    browserItemCursor_ = static_cast<std::size_t>(
+        (static_cast<int>(browserItemCursor_) + offset + count) % count);
+    ApplyCategorySelection();
     RefreshSelection();
     DMAudio.PlayFrontEndSound(kHelpSound, 0);
 }
@@ -556,9 +596,17 @@ void TaxiManager::SelectRelative(int offset) {
 void TaxiManager::RefreshSelection() {
     destinationMenuVisible_ = true;
 
-    if (const Destination *destination = SelectedDestination()) {
-        hud_.ShowSelection(destination->name, kOrange, kBrowseTextDurationMs);
+    const Destination *destination = SelectedDestination();
+
+    if (!destination) {
+        return;
     }
+
+    const std::string category = browserCategoryCursor_ < browserCategories_.size()
+                                     ? browserCategories_[browserCategoryCursor_].name
+                                     : std::string{};
+    hud_.ShowDestinationSelection(category, destination->name, destination->icon, kOrange,
+                                  kBrowseTextDurationMs);
 }
 
 void TaxiManager::OpenDestinationBrowser() {
@@ -639,7 +687,7 @@ void TaxiManager::ProcessDestinationBrowser(CPlayerPed *player, CVehicle *taxi) 
     }
 }
 
-void TaxiManager::BuildDestinationBrowser() {
+void TaxiManager::BuildDestinationCategories() {
     const std::optional<std::size_t> selectedId =
         selectionCursor_ < availableDestinations_.size()
             ? std::optional<std::size_t>{availableDestinations_[selectionCursor_]}
@@ -689,11 +737,14 @@ void TaxiManager::BuildDestinationBrowser() {
             }
         }
     }
+}
 
+void TaxiManager::BuildDestinationBrowser() {
+    BuildDestinationCategories();
     SelectBrowserDestination();
 }
 
-void TaxiManager::SelectBrowserDestination() {
+void TaxiManager::ApplyCategorySelection() {
     if (browserCategoryCursor_ >= browserCategories_.size()) {
         return;
     }
@@ -711,7 +762,10 @@ void TaxiManager::SelectBrowserDestination() {
         selectionCursor_ =
             static_cast<std::size_t>(std::distance(availableDestinations_.begin(), found));
     }
+}
 
+void TaxiManager::SelectBrowserDestination() {
+    ApplyCategorySelection();
     UpdateDestinationBrowserHud();
     DMAudio.PlayFrontEndSound(kHelpSound, 0);
 }

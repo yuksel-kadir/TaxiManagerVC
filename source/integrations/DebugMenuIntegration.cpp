@@ -18,11 +18,13 @@ using AddFloat32 = DebugMenuEntry *(__cdecl *)(const char *, const char *, float
                                                void(__cdecl *)(), float, float, float);
 using SetWrap = void(__cdecl *)(DebugMenuEntry *, bool);
 
-constexpr std::array<const char *, 17> kActionNames{"Hail",
+constexpr std::array<const char *, 19> kActionNames{"Hail",
                                                     "Toggle destinations",
                                                     "Previous destination",
                                                     "Next destination",
                                                     "Confirm destination",
+                                                    "Previous destination category",
+                                                    "Next destination category",
                                                     "Skip travel",
                                                     "Stop taxi",
                                                     "Lock doors",
@@ -131,6 +133,8 @@ void DebugMenuIntegration::BuildKeyboardLabels() {
     SetLabel(keyboardLabels_, VK_TAB, "Tab");
     SetLabel(keyboardLabels_, VK_RETURN, "Enter");
     SetLabel(keyboardLabels_, VK_SHIFT, "Shift");
+    SetLabel(keyboardLabels_, VK_LSHIFT, "Left Shift");
+    SetLabel(keyboardLabels_, VK_RSHIFT, "Right Shift");
     SetLabel(keyboardLabels_, VK_CONTROL, "Control");
     SetLabel(keyboardLabels_, VK_MENU, "Alt");
     SetLabel(keyboardLabels_, VK_PAUSE, "Pause");

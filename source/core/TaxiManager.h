@@ -70,13 +70,16 @@ class TaxiManager final {
     void CompleteTrip(CPlayerPed *player, CVehicle *taxi);
     void Cleanup(CPlayerPed *player, CVehicle *taxi, bool chargeFare,
                  bool delayTaxiRelease = false);
-    void SelectRelative(int offset);
+    void SelectCompactCategory(int offset);
+    void SelectCompactDestination(int offset);
     void RefreshSelection();
     bool RefreshAvailableDestinations();
     void OpenDestinationBrowser();
     void CloseDestinationBrowser();
     void ProcessDestinationBrowser(CPlayerPed *player, CVehicle *taxi);
     void BuildDestinationBrowser();
+    void BuildDestinationCategories();
+    void ApplyCategorySelection();
     void SelectBrowserDestination();
     void UpdateDestinationBrowserHud();
     void SetPlayerControl(bool enabled);

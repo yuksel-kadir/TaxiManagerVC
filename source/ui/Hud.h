@@ -13,6 +13,8 @@
 class Hud final {
   public:
     void ShowSelection(std::string text, CRGBA color, unsigned int durationMs);
+    void ShowDestinationSelection(std::string category, std::string destination,
+                                  DestinationIcon icon, CRGBA color, unsigned int durationMs);
     void ShowFare(int fare);
     void ShowHelp(std::string text);
     void HideHelp() noexcept;
@@ -35,9 +37,12 @@ class Hud final {
 
   private:
     std::string selection_;
+    std::string selectionCategory_;
+    DestinationIcon selectionIcon_{DestinationIcon::MapHere};
     std::string fare_;
     CRGBA selectionColor_{232, 156, 38, 255};
     bool showSelection_{};
+    bool showSelectionIcon_{};
     unsigned int selectionExpiresAt_{};
     bool showFare_{};
     unsigned int fareExpiresAt_{};
@@ -55,6 +60,6 @@ class Hud final {
                          bool centred);
     CSprite2d *ResolveDestinationSprite(DestinationIcon icon);
     static CSprite2d *ResolveDiazMansionSprite();
-    void DrawStatusMessages(int fontStyle) const;
+    void DrawStatusMessages(int fontStyle);
     void DrawDestinationBrowser(int fontStyle);
 };

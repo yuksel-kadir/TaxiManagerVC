@@ -10,12 +10,14 @@
 #include <unordered_map>
 
 namespace {
-constexpr std::array<const char *, 17> kActionNames{
+constexpr std::array<const char *, 19> kActionNames{
     "Hail",
     "ToggleDestinations",
     "PreviousDestination",
     "NextDestination",
     "ConfirmDestination",
+    "PreviousDestinationCategory",
+    "NextDestinationCategory",
     "SkipTravel",
     "StopTaxi",
     "LockDoors",
@@ -79,6 +81,8 @@ TaxiConfig::TaxiConfig() {
                  {VK_LEFT, 'A', 10},
                  {VK_RIGHT, 'D', 11},
                  {VK_DOWN, 'S', 9},
+                 {VK_LSHIFT, 0, -1},
+                 {VK_RSHIFT, 0, -1},
                  {'G', 0, 12},
                  {VK_SPACE, 0, 14},
                  {'1', 0, 18},

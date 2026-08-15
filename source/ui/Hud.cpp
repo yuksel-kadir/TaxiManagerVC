@@ -15,8 +15,22 @@
 
 void Hud::ShowSelection(std::string text, CRGBA color, unsigned int durationMs) {
     selection_ = std::move(text);
+    selectionCategory_.clear();
     selectionColor_ = color;
     showSelection_ = true;
+    showSelectionIcon_ = false;
+    selectionExpiresAt_ = static_cast<unsigned int>(CTimer::m_snTimeInMilliseconds) + durationMs;
+}
+
+void Hud::ShowDestinationSelection(std::string category, std::string destination,
+                                   DestinationIcon icon, CRGBA color,
+                                   unsigned int durationMs) {
+    selectionCategory_ = std::move(category);
+    selection_ = std::move(destination);
+    selectionIcon_ = icon;
+    selectionColor_ = color;
+    showSelection_ = true;
+    showSelectionIcon_ = true;
     selectionExpiresAt_ = static_cast<unsigned int>(CTimer::m_snTimeInMilliseconds) + durationMs;
 }
 
@@ -81,6 +95,8 @@ void Hud::Reset() noexcept {
     showSelection_ = false;
     showFare_ = false;
     selection_.clear();
+    selectionCategory_.clear();
+    showSelectionIcon_ = false;
     fare_.clear();
     help_.clear();
     helpShowAt_ = 0;
@@ -122,12 +138,32 @@ void Hud::DrawText(const std::string &text, float x, float y, CRGBA color, int f
     CFont::PrintString(x, y, text.c_str());
 }
 
-void Hud::DrawStatusMessages(int fontStyle) const {
+void Hud::DrawStatusMessages(int fontStyle) {
     const unsigned int now = static_cast<unsigned int>(CTimer::m_snTimeInMilliseconds);
 
     if (showSelection_ && now < selectionExpiresAt_) {
-        DrawText(selection_, SCREEN_COORD_LEFT(25.0F), SCREEN_COORD_BOTTOM(330.0F), selectionColor_,
-                 fontStyle, false);
+        if (showSelectionIcon_) {
+            const float left = SCREEN_COORD_LEFT(25.0F);
+            const float categoryY = SCREEN_COORD_BOTTOM(365.0F);
+            const float destinationY = SCREEN_COORD_BOTTOM(330.0F);
+            constexpr float iconSize = 24.0F;
+            CSprite2d *icon = ResolveDestinationSprite(selectionIcon_);
+
+            DrawText(selectionCategory_, left, categoryY, selectionColor_, fontStyle, false);
+
+            if (icon && icon->m_pTexture) {
+                icon->Draw(CRect(left, destinationY,
+                                 left + SCREEN_MULTIPLIER(iconSize),
+                                 destinationY + SCREEN_MULTIPLIER(iconSize)),
+                           CRGBA(255, 255, 255, 255));
+            }
+
+            DrawText(selection_, SCREEN_COORD_LEFT(57.0F), destinationY, selectionColor_, fontStyle,
+                     false);
+        } else {
+            DrawText(selection_, SCREEN_COORD_LEFT(25.0F), SCREEN_COORD_BOTTOM(330.0F),
+                     selectionColor_, fontStyle, false);
+        }
     }
 
     if (showFare_ && now < fareExpiresAt_) {

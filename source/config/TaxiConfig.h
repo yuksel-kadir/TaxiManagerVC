@@ -25,7 +25,7 @@ class TaxiConfig final {
     int menuFontStyle{};
     float waypointMaximumRoadSnapDistance{30.0F};
     std::int32_t freeRides{};
-    std::array<ActionBinding, 17> bindings{};
+    std::array<ActionBinding, 19> bindings{};
 
     TaxiConfig();
     static TaxiConfig Load(const std::filesystem::path &path);

@@ -64,6 +64,8 @@ enum class TaxiAction : std::uint8_t {
     PreviousDestination,
     NextDestination,
     ConfirmDestination,
+    PreviousDestinationCategory,
+    NextDestinationCategory,
     SkipTravel,
     StopTaxi,
     LockDoors,
