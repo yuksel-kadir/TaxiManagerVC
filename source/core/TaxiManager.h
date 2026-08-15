@@ -23,6 +23,7 @@ class TaxiManager final {
   private:
     struct DestinationCategory final {
         std::string name;
+        std::optional<DestinationRegion> region;
         std::vector<std::size_t> destinationIds;
     };
 
@@ -74,11 +75,12 @@ class TaxiManager final {
     void SelectCompactDestination(int offset);
     void RefreshSelection();
     bool RefreshAvailableDestinations();
-    void OpenDestinationBrowser();
+    void OpenDestinationBrowser(CPlayerPed *player, CVehicle *taxi);
     void CloseDestinationBrowser();
     void ProcessDestinationBrowser(CPlayerPed *player, CVehicle *taxi);
-    void BuildDestinationBrowser();
+    void BuildDestinationBrowser(CPlayerPed *player = nullptr, CVehicle *taxi = nullptr);
     void BuildDestinationCategories();
+    void SelectPlayerRegionCategory(CPlayerPed *player, CVehicle *taxi);
     void ApplyCategorySelection();
     void SelectBrowserDestination();
     void UpdateDestinationBrowserHud();

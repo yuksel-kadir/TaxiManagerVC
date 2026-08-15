@@ -60,6 +60,28 @@ bool CanEnterTaxi(CPlayerPed *player) {
     return player && !player->m_bInVehicle && player->bIsStanding && player->IsPedInControl();
 }
 
+DestinationRegion RegionForPosition(const CVector &position) {
+    // Vice City's map levels distinguish only Beach and Mainland. Starfish Island is a
+    // navigation territory spanning the STARISL and MANSION zones in the original map data.
+    constexpr float starfishWest = -724.0F;
+    constexpr float starfishEast = -40.0F;
+    constexpr float starfishSouth = -670.0F;
+    constexpr float starfishNorth = -320.0F;
+
+    if (position.x >= starfishWest && position.x <= starfishEast &&
+        position.y >= starfishSouth && position.y <= starfishNorth) {
+        return DestinationRegion::StarfishIsland;
+    }
+
+    switch (CTheZones::GetLevelFromPosition(&position)) {
+    case LEVEL_MAINLAND:
+        return DestinationRegion::Mainland;
+    case LEVEL_BEACH:
+    default:
+        return DestinationRegion::Beach;
+    }
+}
+
 } // namespace
 
 TaxiManager::TaxiManager() {
@@ -203,6 +225,7 @@ void TaxiManager::ProcessAwaitingEntry(CPlayerPed *player, CVehicle *taxi) {
         state_ = TaxiSessionState::SelectingDestination;
         stateStartedAt_ = CTimer::m_snTimeInMilliseconds;
         BuildDestinationCategories();
+        SelectPlayerRegionCategory(player, taxi);
         RefreshSelection();
         hud_.ShowHelp("Taxi passenger: ~h~~k~~GO_FORWARD~~w~ show destinations; "
                       "~h~~k~~GO_LEFT~~w~ / ~h~~k~~GO_RIGHT~~w~ browse; "
@@ -259,7 +282,7 @@ void TaxiManager::ProcessDestinationMenus(CPlayerPed *player, CVehicle *taxi) {
         if (destinationBrowserVisible_) {
             CloseDestinationBrowser();
         } else {
-            OpenDestinationBrowser();
+            OpenDestinationBrowser(player, taxi);
         }
     }
 
@@ -294,6 +317,7 @@ void TaxiManager::ProcessCompactDestinationMenu(CPlayerPed *player, CVehicle *ta
             destinationMenuVisible_ = true;
             RefreshAvailableDestinations();
             BuildDestinationCategories();
+            SelectPlayerRegionCategory(player, taxi);
             RefreshSelection();
         }
     }
@@ -304,6 +328,7 @@ void TaxiManager::ProcessCompactDestinationMenu(CPlayerPed *player, CVehicle *ta
             destinationMenuVisible_ = true;
             RefreshAvailableDestinations();
             BuildDestinationCategories();
+            SelectPlayerRegionCategory(player, taxi);
         }
 
         SelectCompactCategory(previousCategoryPressed ? -1 : 1);
@@ -318,6 +343,7 @@ void TaxiManager::ProcessCompactDestinationMenu(CPlayerPed *player, CVehicle *ta
             destinationMenuVisible_ = true;
             RefreshAvailableDestinations();
             BuildDestinationCategories();
+            SelectPlayerRegionCategory(player, taxi);
         }
 
         SelectCompactDestination(previousPressed ? -1 : 1);
@@ -609,7 +635,7 @@ void TaxiManager::RefreshSelection() {
                                   kBrowseTextDurationMs);
 }
 
-void TaxiManager::OpenDestinationBrowser() {
+void TaxiManager::OpenDestinationBrowser(CPlayerPed *player, CVehicle *taxi) {
     RefreshAvailableDestinations();
 
     if (availableDestinations_.empty()) {
@@ -622,7 +648,7 @@ void TaxiManager::OpenDestinationBrowser() {
     destinationBrowserVisible_ = true;
     hud_.HideHelp();
     hud_.HideSelection();
-    BuildDestinationBrowser();
+    BuildDestinationBrowser(player, taxi);
 }
 
 void TaxiManager::CloseDestinationBrowser() {
@@ -695,7 +721,7 @@ void TaxiManager::BuildDestinationCategories() {
     browserCategories_.clear();
 
     const auto addCategory = [this](const char *name, DestinationRegion island) {
-        DestinationCategory category{name, {}};
+        DestinationCategory category{name, island, {}};
         for (const std::size_t id : availableDestinations_) {
             const Destination *destination = DestinationById(id);
 
@@ -717,7 +743,8 @@ void TaxiManager::BuildDestinationCategories() {
 
     if (mapWaypoint_ && std::find(availableDestinations_.begin(), availableDestinations_.end(),
                                   waypointId) != availableDestinations_.end()) {
-        browserCategories_.push_back(DestinationCategory{"Custom Waypoint", {waypointId}});
+        browserCategories_.push_back(
+            DestinationCategory{"Custom Waypoint", std::nullopt, {waypointId}});
     }
 
     browserCategoryCursor_ = 0;
@@ -739,8 +766,28 @@ void TaxiManager::BuildDestinationCategories() {
     }
 }
 
-void TaxiManager::BuildDestinationBrowser() {
+void TaxiManager::SelectPlayerRegionCategory(CPlayerPed *player, CVehicle *taxi) {
+    if (!player) {
+        return;
+    }
+
+    const bool useTaxiPosition = taxi && player->m_bInVehicle && player->m_pVehicle == taxi;
+    const CVector &position = useTaxiPosition ? taxi->GetPosition() : player->GetPosition();
+    const DestinationRegion playerRegion = RegionForPosition(position);
+
+    for (std::size_t category = 0; category < browserCategories_.size(); ++category) {
+        if (browserCategories_[category].region == playerRegion) {
+            browserCategoryCursor_ = category;
+            browserItemCursor_ = 0;
+            ApplyCategorySelection();
+            return;
+        }
+    }
+}
+
+void TaxiManager::BuildDestinationBrowser(CPlayerPed *player, CVehicle *taxi) {
     BuildDestinationCategories();
+    SelectPlayerRegionCategory(player, taxi);
     SelectBrowserDestination();
 }
 
