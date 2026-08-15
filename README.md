@@ -1,6 +1,6 @@
 # TaxiManagerVC
 
-TaxiManagerVC is a Plugin-SDK ASI plugin that lets Tommy use ambient taxis as a passenger in
+TaxiManagerVC is a Plugin-SDK ASI plugin that lets the player use ambient taxis as a passenger in
 Grand Theft Auto: Vice City Classic.
 
 ## Compatibility
@@ -15,7 +15,7 @@ Edition are not supported.
 
 ## Features
 
-- Hail ambient Taxi, Cabbie, and Kaufman Cab vehicles
+- Hail supported ambient taxi vehicles
 - Enter and ride as a passenger
 - 26 configurable destinations grouped by city area
 - Destination browser with radar icons
@@ -26,6 +26,12 @@ Edition are not supported.
 - Editable INI controls and gameplay settings
 - Editable CSV destinations
 - Optional Debug Menu and Menu Map integrations
+
+## Opening the Destination Browser
+
+After the player enters a taxi as a passenger, press **Tab** on the keyboard or **Select** on a
+gamepad to open the destination browser. Press the same control again, or use the close control
+listed below, to leave the browser.
 
 ## Default Controls
 
