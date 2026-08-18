@@ -23,6 +23,8 @@ class TaxiConfig final {
     float cameraMouseSensitivity{0.1F};
     float cameraMaxYawDegrees{110.0F};
     int menuFontStyle{};
+    float destinationBrowserWidth{510.0F};
+    float destinationBrowserHeight{356.0F};
     float waypointMaximumRoadSnapDistance{30.0F};
     std::int32_t freeRides{};
     std::array<ActionBinding, 19> bindings{};

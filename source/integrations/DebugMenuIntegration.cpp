@@ -117,6 +117,10 @@ void DebugMenuIntegration::TryRegister(TaxiConfig &config,
     DebugMenuEntry *menuFont = addInt32("TaxiManager|UI", "Menu font style", &config.menuFontStyle,
                                         SaveSettings, 1, 0, 2, menuFontLabels);
     setWrap(menuFont, true);
+    addFloat32("TaxiManager|UI", "Destination browser width", &config.destinationBrowserWidth,
+               SaveSettings, 5.0F, 360.0F, 900.0F);
+    addFloat32("TaxiManager|UI", "Destination browser height", &config.destinationBrowserHeight,
+               SaveSettings, 5.0F, 220.0F, 700.0F);
     registered_ = true;
 }
 

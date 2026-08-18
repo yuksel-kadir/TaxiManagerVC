@@ -976,7 +976,8 @@ const Destination *TaxiManager::DestinationById(std::size_t id) const {
 }
 
 void TaxiManager::DrawHud() {
-    hud_.Draw(config_.menuFontStyle);
+    hud_.Draw(config_.menuFontStyle, config_.destinationBrowserWidth,
+              config_.destinationBrowserHeight);
 }
 
 void TaxiManager::Shutdown() {

@@ -111,13 +111,13 @@ void Hud::Reset() noexcept {
     browserDestinations_.clear();
 }
 
-void Hud::Draw(int fontStyle) {
+void Hud::Draw(int fontStyle, float destinationBrowserWidth, float destinationBrowserHeight) {
     // TestMenu verifies VC's actual safe enum: Rage/Gothic, Subtitles,
     // Pricedown. Earlier code incorrectly treated 2 as Menu and used invalid 3.
     fontStyle = std::clamp(fontStyle, 0, 2);
 
     DrawStatusMessages(fontStyle);
-    DrawDestinationBrowser(fontStyle);
+    DrawDestinationBrowser(fontStyle, destinationBrowserWidth, destinationBrowserHeight);
 }
 
 void Hud::DrawText(const std::string &text, float x, float y, CRGBA color, int fontStyle,
@@ -183,12 +183,22 @@ void Hud::DrawStatusMessages(int fontStyle) {
     }
 }
 
-void Hud::DrawDestinationBrowser(int fontStyle) {
+void Hud::DrawDestinationBrowser(int fontStyle, float width, float height) {
     if (!showBrowser_ || browserDestinations_.empty()) {
         return;
     }
 
-    constexpr std::size_t maxVisible = 7;
+    constexpr float listTopMargin = 30.0F;
+    constexpr float listBottomMargin = 18.0F;
+    constexpr float footerBottomMargin = 14.0F;
+    constexpr float controlRowHeight = 21.0F;
+    constexpr float rowHeightVirtual = 27.0F;
+    const std::size_t controlRows = browserCurrentDestination_.empty() ? 4 : 5;
+    const float reservedHeight = listTopMargin + listBottomMargin + footerBottomMargin +
+                                 controlRowHeight * static_cast<float>(controlRows);
+    const float availableListHeight = std::max(height - reservedHeight, rowHeightVirtual);
+    const std::size_t maxVisible = std::max<std::size_t>(
+        1, static_cast<std::size_t>(availableListHeight / rowHeightVirtual));
     std::size_t first =
         browserSelectedIndex_ > maxVisible / 2 ? browserSelectedIndex_ - maxVisible / 2 : 0;
 
@@ -200,16 +210,9 @@ void Hud::DrawDestinationBrowser(int fontStyle) {
     const std::size_t last = std::min(first + maxVisible, browserDestinations_.size());
     const float panelLeft = SCREEN_COORD_LEFT(40.0F);
     const float panelTop = SCREEN_COORD_TOP(280.0F);
-    const float panelRight = SCREEN_COORD_LEFT(550.0F);
-    const float rowHeight = SCREEN_MULTIPLIER(27.0F);
-    constexpr float listTopMargin = 30.0F;
-    constexpr float listBottomMargin = 18.0F;
-    const float currentDestinationHeight =
-        browserCurrentDestination_.empty() ? 0.0F : SCREEN_MULTIPLIER(21.0F);
-    const float panelBottom = panelTop + SCREEN_MULTIPLIER(listTopMargin) +
-                              rowHeight * static_cast<float>(last - first) +
-                              SCREEN_MULTIPLIER(listBottomMargin + 98.0F) +
-                              currentDestinationHeight;
+    const float panelRight = panelLeft + SCREEN_MULTIPLIER(width);
+    const float panelBottom = panelTop + SCREEN_MULTIPLIER(height);
+    const float rowHeight = SCREEN_MULTIPLIER(rowHeightVirtual);
 
     CSprite2d::DrawRect(CRect(panelLeft, panelTop, panelRight, panelBottom), CRGBA(0, 0, 0, 205));
 
@@ -256,7 +259,8 @@ void Hud::DrawDestinationBrowser(int fontStyle) {
         y += rowHeight;
     }
 
-    y += SCREEN_MULTIPLIER(listBottomMargin);
+    y = panelBottom - SCREEN_MULTIPLIER(
+                          footerBottomMargin + controlRowHeight * static_cast<float>(controlRows));
 
     CFont::SetBackgroundOff();
     CFont::SetScale(SCREEN_MULTIPLIER(0.58F), SCREEN_MULTIPLIER(1.05F));

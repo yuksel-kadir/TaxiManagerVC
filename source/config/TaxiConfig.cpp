@@ -156,6 +156,12 @@ TaxiConfig TaxiConfig::Load(const std::filesystem::path &path) {
     // VC safe font enum verified by TestMenu: 0 Rage/Gothic, 1 Subtitles,
     // 2 Pricedown. Never pass the previously assumed raw value 3.
     config.menuFontStyle = ReadInt(values, "UI.MenuFontStyle", config.menuFontStyle, 0, 2);
+    config.destinationBrowserWidth =
+        ReadFloat(values, "UI.DestinationBrowserWidth", config.destinationBrowserWidth, 360.0F,
+                  900.0F);
+    config.destinationBrowserHeight =
+        ReadFloat(values, "UI.DestinationBrowserHeight", config.destinationBrowserHeight, 220.0F,
+                  700.0F);
     config.waypointMaximumRoadSnapDistance =
         ReadFloat(values, "Waypoint.MaximumRoadSnapDistance",
                   config.waypointMaximumRoadSnapDistance, 5.0F, 100.0F);
@@ -195,6 +201,8 @@ void TaxiConfig::SaveDebugSettings(const std::filesystem::path &path) const {
 
     write("Gameplay", "FreeRides", freeRides);
     write("UI", "MenuFontStyle", menuFontStyle);
+    writeFloat("UI", "DestinationBrowserWidth", destinationBrowserWidth);
+    writeFloat("UI", "DestinationBrowserHeight", destinationBrowserHeight);
     writeFloat("Camera", "FOV", cameraFov);
     WritePrivateProfileStringA(nullptr, nullptr, nullptr, iniPath.c_str());
 }

@@ -33,7 +33,7 @@ class Hud final {
     }
 
     void Reset() noexcept;
-    void Draw(int fontStyle);
+    void Draw(int fontStyle, float destinationBrowserWidth, float destinationBrowserHeight);
     static void Help(const std::string &text, bool quick = true);
 
   private:
@@ -64,5 +64,5 @@ class Hud final {
     CSprite2d *ResolveDestinationSprite(DestinationIcon icon);
     static CSprite2d *ResolveDiazMansionSprite();
     void DrawStatusMessages(int fontStyle);
-    void DrawDestinationBrowser(int fontStyle);
+    void DrawDestinationBrowser(int fontStyle, float width, float height);
 };
