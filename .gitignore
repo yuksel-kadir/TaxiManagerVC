@@ -22,6 +22,10 @@ _deps/
 package/
 *.log
 
+# Python cache files
+__pycache__/
+*.pyc
+
 # Windows
 Thumbs.db
 Desktop.ini

@@ -77,5 +77,27 @@ northpointmallradaricon.txd
 
 ## Building
 
-Set `PLUGIN_SDK_DIR` to the Plugin-SDK root, open `TaxiManagerVC.sln`, and build `Debug|Win32` or
-`Release|Win32`. Release output is written to `bin/VC/Release`.
+Run the Python build script from the repository root:
+
+```powershell
+python .\build.py
+```
+
+This opens an interactive menu with options for Debug, Release, both configurations, rebuilding, and
+building Release with deployment.
+
+Commands can also be passed directly:
+
+```powershell
+python .\build.py debug
+python .\build.py release
+```
+
+Build Release and install it into the configured Vice City directory:
+
+```powershell
+python .\build.py release --deploy
+```
+
+The script uses `PLUGIN_SDK_DIR`, or the adjacent `plugin-sdk` directory when the variable is not set.
+Deployment uses `GTA_VC_DIR` and only runs when `--deploy` is provided.
