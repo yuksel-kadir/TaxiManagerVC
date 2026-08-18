@@ -644,8 +644,10 @@ void TaxiManager::RefreshSelection() {
     const std::string category = browserCategoryCursor_ < browserCategories_.size()
                                      ? browserCategories_[browserCategoryCursor_].name
                                      : std::string{};
-    hud_.ShowDestinationSelection(category, destination->name, destination->icon, kOrange,
-                                  kBrowseTextDurationMs);
+    const std::string currentDestination =
+        tripActive_ && tripDestination_ ? tripDestination_->name : std::string{};
+    hud_.ShowDestinationSelection(category, destination->name, destination->icon,
+                                  currentDestination, kOrange, kBrowseTextDurationMs);
 }
 
 void TaxiManager::OpenDestinationBrowser(CPlayerPed *player, CVehicle *taxi) {
@@ -845,7 +847,9 @@ void TaxiManager::UpdateDestinationBrowserHud() {
         }
     }
 
-    hud_.ShowBrowser(category.name, std::move(rows), browserItemCursor_);
+    const std::string currentDestination =
+        tripActive_ && tripDestination_ ? tripDestination_->name : std::string{};
+    hud_.ShowBrowser(category.name, std::move(rows), browserItemCursor_, currentDestination);
 }
 
 bool TaxiManager::RefreshAvailableDestinations() {

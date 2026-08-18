@@ -16,6 +16,7 @@
 void Hud::ShowSelection(std::string text, CRGBA color, unsigned int durationMs) {
     selection_ = std::move(text);
     selectionCategory_.clear();
+    selectionCurrentDestination_.clear();
     selectionColor_ = color;
     showSelection_ = true;
     showSelectionIcon_ = false;
@@ -23,10 +24,11 @@ void Hud::ShowSelection(std::string text, CRGBA color, unsigned int durationMs) 
 }
 
 void Hud::ShowDestinationSelection(std::string category, std::string destination,
-                                   DestinationIcon icon, CRGBA color,
-                                   unsigned int durationMs) {
+                                   DestinationIcon icon, std::string currentDestination,
+                                   CRGBA color, unsigned int durationMs) {
     selectionCategory_ = std::move(category);
     selection_ = std::move(destination);
+    selectionCurrentDestination_ = std::move(currentDestination);
     selectionIcon_ = icon;
     selectionColor_ = color;
     showSelection_ = true;
@@ -57,10 +59,11 @@ void Hud::HideHelp() noexcept {
 }
 
 void Hud::ShowBrowser(std::string category, std::vector<DestinationBrowserRow> destinations,
-                      std::size_t selectedIndex) {
+                      std::size_t selectedIndex, std::string currentDestination) {
     browserCategory_ = std::move(category);
     browserDestinations_ = std::move(destinations);
     browserSelectedIndex_ = selectedIndex;
+    browserCurrentDestination_ = std::move(currentDestination);
     showBrowser_ = true;
 }
 
@@ -96,6 +99,7 @@ void Hud::Reset() noexcept {
     showFare_ = false;
     selection_.clear();
     selectionCategory_.clear();
+    selectionCurrentDestination_.clear();
     showSelectionIcon_ = false;
     fare_.clear();
     help_.clear();
@@ -103,6 +107,7 @@ void Hud::Reset() noexcept {
     helpPending_ = false;
     showBrowser_ = false;
     browserCategory_.clear();
+    browserCurrentDestination_.clear();
     browserDestinations_.clear();
 }
 
@@ -160,6 +165,12 @@ void Hud::DrawStatusMessages(int fontStyle) {
 
             DrawText(selection_, SCREEN_COORD_LEFT(57.0F), destinationY, selectionColor_, fontStyle,
                      false);
+
+            if (!selectionCurrentDestination_.empty()) {
+                DrawText("Current destination: " + selectionCurrentDestination_, left,
+                         SCREEN_COORD_BOTTOM(295.0F), CRGBA(235, 235, 235, 255), fontStyle,
+                         false);
+            }
         } else {
             DrawText(selection_, SCREEN_COORD_LEFT(25.0F), SCREEN_COORD_BOTTOM(330.0F),
                      selectionColor_, fontStyle, false);
@@ -193,9 +204,12 @@ void Hud::DrawDestinationBrowser(int fontStyle) {
     const float rowHeight = SCREEN_MULTIPLIER(27.0F);
     constexpr float listTopMargin = 30.0F;
     constexpr float listBottomMargin = 18.0F;
+    const float currentDestinationHeight =
+        browserCurrentDestination_.empty() ? 0.0F : SCREEN_MULTIPLIER(21.0F);
     const float panelBottom = panelTop + SCREEN_MULTIPLIER(listTopMargin) +
                               rowHeight * static_cast<float>(last - first) +
-                              SCREEN_MULTIPLIER(listBottomMargin + 56.0F);
+                              SCREEN_MULTIPLIER(listBottomMargin + 98.0F) +
+                              currentDestinationHeight;
 
     CSprite2d::DrawRect(CRect(panelLeft, panelTop, panelRight, panelBottom), CRGBA(0, 0, 0, 205));
 
@@ -250,65 +264,84 @@ void Hud::DrawDestinationBrowser(int fontStyle) {
     CFont::SetDropShadowPosition(1);
     CFont::SetDropColor(CRGBA(0, 0, 0, 255));
     CFont::SetFontStyle(1);
-    CFont::SetColor(CRGBA(190, 190, 190, 255));
     CFont::SetCentreOff();
     CFont::SetRightJustifyOff();
     CFont::SetJustifyOn();
-    CFont::PrintString(textLeft, y, "Left/Right group   Up/Down destination");
 
-    y += SCREEN_MULTIPLIER(21.0F);
-    CFont::PrintString(textLeft, y, "Shift select   Backspace close");
+    const float actionLeft = SCREEN_COORD_LEFT(52.0F);
+    const float controlLeft = SCREEN_COORD_LEFT(280.0F);
+
+    if (!browserCurrentDestination_.empty()) {
+        CFont::SetColor(CRGBA(219, 129, 193, 255));
+        CFont::PrintString(actionLeft, y, "Current destination:");
+        CFont::SetColor(CRGBA(235, 235, 235, 255));
+        CFont::PrintString(controlLeft, y, browserCurrentDestination_.c_str());
+        y += SCREEN_MULTIPLIER(21.0F);
+    }
+
+    const auto drawControl = [&](const char *action, const char *control) {
+        CFont::SetColor(CRGBA(219, 129, 193, 255));
+        CFont::PrintString(actionLeft, y, action);
+        CFont::SetColor(CRGBA(235, 235, 235, 255));
+        CFont::PrintString(controlLeft, y, control);
+        y += SCREEN_MULTIPLIER(21.0F);
+    };
+
+    drawControl("Change destination area:", "Left / Right");
+    drawControl("Browse destinations:", "Up / Down");
+    drawControl("Confirm destination:", "Shift");
+    drawControl("Close browser:", "Backspace");
 }
 
 CSprite2d *Hud::ResolveDestinationSprite(DestinationIcon icon) {
     using I = DestinationIcon;
 
     switch (icon) {
-    case I::Lawyer:
-        return &CRadar::LawyerSprite;
-    case I::Tshirt:
-        return &CRadar::TshirtSprite;
-    case I::Boatyard:
-        return &CRadar::BoatyardSprite;
-    case I::Strip:
-        return &CRadar::StripSprite;
-    case I::Gun:
-        return &CRadar::GunSprite;
-    case I::Spray:
-        return &CRadar::SpraySprite;
-    case I::Save:
-        return &CRadar::SaveSprite;
-    case I::Club:
-        return &CRadar::ClubSprite;
-    case I::Avery:
-        return &CRadar::AverySprite;
-    case I::DiazMansion:
-        return ResolveDiazMansionSprite();
-    case I::Mall:
-        return mallSprite_.m_pTexture ? &mallSprite_ : &CRadar::ArrowSprite;
-    case I::FilmStudio:
-        return &CRadar::FilmStudioSprite;
-    case I::Vrock:
-        return &CRadar::RVRockSprite;
-    case I::Bikers:
-        return &CRadar::BikersSprite;
-    case I::Printworks:
-        return &CRadar::PrintworksSprite;
-    case I::Icecream:
-        return &CRadar::IcecreamSprite;
-    case I::Kcabs:
-        return &CRadar::KCabsSprite;
-    case I::Haitians:
-        return &CRadar::HaitiansSprite;
-    case I::Phil:
-        return &CRadar::PhilSprite;
-    case I::Sunyard:
-        return &CRadar::SunYardSprite;
-    case I::Cubans:
-        return &CRadar::CubansSprite;
-    case I::MapHere:
-    default:
-        return &CRadar::ArrowSprite;
+        case I::Lawyer:
+            return &CRadar::LawyerSprite;
+        case I::Tshirt:
+            return &CRadar::TshirtSprite;
+        case I::Boatyard:
+            return &CRadar::BoatyardSprite;
+        case I::Strip:
+            return &CRadar::StripSprite;
+        case I::Gun:
+            return &CRadar::GunSprite;
+        case I::Spray:
+            return &CRadar::SpraySprite;
+        case I::Save:
+            return &CRadar::SaveSprite;
+        case I::Club:
+            return &CRadar::ClubSprite;
+        case I::Avery:
+            return &CRadar::AverySprite;
+        case I::DiazMansion:
+            return ResolveDiazMansionSprite();
+        case I::Mall:
+            return mallSprite_.m_pTexture ? &mallSprite_ : &CRadar::ArrowSprite;
+        case I::FilmStudio:
+            return &CRadar::FilmStudioSprite;
+        case I::Vrock:
+            return &CRadar::RVRockSprite;
+        case I::Bikers:
+            return &CRadar::BikersSprite;
+        case I::Printworks:
+            return &CRadar::PrintworksSprite;
+        case I::Icecream:
+            return &CRadar::IcecreamSprite;
+        case I::Kcabs:
+            return &CRadar::KCabsSprite;
+        case I::Haitians:
+            return &CRadar::HaitiansSprite;
+        case I::Phil:
+            return &CRadar::PhilSprite;
+        case I::Sunyard:
+            return &CRadar::SunYardSprite;
+        case I::Cubans:
+            return &CRadar::CubansSprite;
+        case I::MapHere:
+        default:
+            return &CRadar::ArrowSprite;
     }
 }
 

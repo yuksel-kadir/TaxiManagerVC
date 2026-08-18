@@ -19,6 +19,7 @@ Edition are not supported.
 - Enter and ride as a passenger
 - 26 configurable destinations grouped by city area
 - Destination browser with radar icons
+- Current trip destination shown in both destination menus
 - Distance-based fares and optional free rides
 - Redirect, stop, lock, and unlock controls
 - Skip travel with fade and safe teleport
